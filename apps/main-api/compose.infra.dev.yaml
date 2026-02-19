@@ -1,0 +1,20 @@
+# Development purposes only
+services:
+  # main-api-backend
+  postgres-api-db:
+    image: postgres:18.1-alpine3.22
+    restart: always
+    container_name: postgres-api-db
+    ports:
+      - "5432:5432"
+    env_file:
+      - ./config/.env.development
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ./postgres_api_db_data:/var/lib/postgresql
+
+volumes:
+  postgres_api_db_data:

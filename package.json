@@ -1,0 +1,23 @@
+{
+  "name": "nest-auth-microservice-bootstrap",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "pnpm -r run build",
+    "start:dev": "pnpm --parallel run start:dev",
+    "test": "pnpm -r test"
+  },
+  "dependencies": {
+    "@apps/client-api-gateway": "workspace:*",
+    "@apps/auth-ms": "workspace:*",
+    "@apps/main-api": "workspace:*"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.28.0",
+  "volta": {
+    "node": "24.13.1"
+  }
+}

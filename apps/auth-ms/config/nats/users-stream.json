@@ -1,0 +1,9 @@
+{
+  "name": "USERS",
+  "description": "Stream to synchronize users entities between main app and auth-ms",
+  "subjects": ["auth.user.*", "app.user.*"],
+  "retention": "workqueue",
+  "max_msgs": -1,
+  "storage": "file",
+  "num_replicas": 1
+}

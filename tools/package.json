@@ -1,0 +1,23 @@
+{
+  "name": "@tools/utils",
+  "version": "1.0.0",
+  "description": "Utils",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "echo \"[utils] Building package...\" && tsc",
+    "dev": "echo \"[utils] Watch mode...\" && tsc --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.28.0"
+}

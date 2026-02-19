@@ -1,0 +1,9 @@
+{
+  "durable_name": "MAIN_API_USER_CONSUMER",
+  "description": "USERS stream durable consumer for main-api",
+  "deliver_policy": "all",
+  "ack_policy": "explicit",
+  "ack_wait": 30000000000,
+  "replay_policy": "instant",
+  "filter_subject": "auth.user.*"
+}

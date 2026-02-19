@@ -1,0 +1,9 @@
+{
+  "durable_name": "AUTH_MS_USERS_CONSUMER",
+  "description": "USERS stream durable consumer for auth-ms",
+  "deliver_policy": "all",
+  "ack_policy": "explicit",
+  "ack_wait": 30000000000,
+  "replay_policy": "instant",
+  "filter_subject": "app.user.*"
+}

@@ -1,0 +1,12 @@
+node_modules
+dist
+postgres_data
+redis_data
+postgres_api_db_data
+postgres_auth_db_data
+redis_shared_cache_data
+nats_data
+test
+.gitignore
+.git
+*.md

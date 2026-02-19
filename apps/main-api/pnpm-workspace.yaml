@@ -1,0 +1,10 @@
+onlyBuiltDependencies:
+  - '@nestjs/core'
+  - '@scarf/scarf'
+  - '@swc/core'
+  - bcrypt
+  - cpu-features
+  - esbuild
+  - protobufjs
+  - sqlite3
+  - ssh2

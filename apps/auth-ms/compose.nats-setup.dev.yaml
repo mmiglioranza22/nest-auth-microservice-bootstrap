@@ -1,0 +1,43 @@
+# Development purposes only
+services:
+  nats:
+    image: nats:2.10-alpine
+    container_name: nats-server
+    command: -c /etc/nats/nats-server.conf
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    volumes:
+      - ./config/nats/jetstream.dev.conf:/etc/nats/nats-server.conf:ro # Mount the config file
+      - ./nats_data:/data/jetstream # Map named volume to the jetstream data directory
+
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://nats:8222/healthz"] # local port mapping should be enabled
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+
+  nats-setup:
+    image: natsio/nats-box:latest
+    container_name: nats-provisioner
+    depends_on:
+      nats:
+        condition: service_healthy
+    volumes:
+      - ./config/nats/users-stream.json:/config/users-stream.json:ro
+      - ./config/nats/main-api-users-consumer.json:/config/main-api-users-consumer.json:ro
+      - ./config/nats/auth-ms-users-consumer.json:/config/auth-ms-users-consumer.json:ro
+    entrypoint: >
+      /bin/sh -c "
+        echo 'Waiting for NATS...' &&
+        nats --server nats://nats-server:4222 stream add --config /config/users-stream.json &&
+        nats --server nats://nats-server:4222 consumer add USERS --config /config/main-api-users-consumer.json &&
+        nats --server nats://nats-server:4222 consumer add USERS --config /config/auth-ms-users-consumer.json &&
+        echo 'Provisioning complete.'
+      "
+    restart: "no"
+
+volumes:
+  nats_data:

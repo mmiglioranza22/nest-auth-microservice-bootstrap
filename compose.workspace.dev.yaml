@@ -1,0 +1,3 @@
+include:
+  - ./apps/auth-ms/compose.infra.dev.yaml
+  - ./apps/main-api/compose.infra.dev.yaml

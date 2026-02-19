@@ -1,0 +1,8 @@
+node_modules
+dist
+postgres_data
+redis_data
+test
+.gitignore
+.git
+*.md

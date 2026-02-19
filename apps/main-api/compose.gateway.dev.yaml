@@ -1,0 +1,16 @@
+# services:
+#   client-gateway-ms:
+#     depends_on:
+#       - nats-server
+#       - redis-shared-cache
+#     build: .
+#     ports:
+#       - 3000:3000
+#     # volumes:
+#     #   - src:/usr/src/app/src
+#     env_file:
+#       - ./config/.env.development
+
+#     environment:
+#       - PORT=3000 # no need
+#       - NATS_SERVERS=nats://nats-server:4222
