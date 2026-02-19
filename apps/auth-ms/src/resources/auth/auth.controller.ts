@@ -2,16 +2,7 @@
 // Nextjs cookie https://www.youtube.com/watch?v=2ZEFTpchGZo
 import * as Constants from './constants';
 import { Response } from 'express';
-import {
-  Controller,
-  Post,
-  Body,
-  HttpCode,
-  HttpStatus,
-  Res,
-  Inject,
-  Get,
-} from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { type EnvVariables } from 'config/env-variables';
 

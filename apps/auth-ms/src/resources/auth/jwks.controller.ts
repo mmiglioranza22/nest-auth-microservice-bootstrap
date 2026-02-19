@@ -1,6 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { publicKeyToJwk } from 'src/utils/jwk.util';
 
+// TODO Add throttler
 @Controller('.well-known')
 export class JwksController {
   @Get('jwks.json')

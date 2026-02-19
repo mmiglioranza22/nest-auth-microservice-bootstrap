@@ -17,18 +17,16 @@ const isNotProd = process.env.NODE_ENV !== 'production';
 export async function bootstrap() {
   const logger = new NestLogger('Main app');
 
-  const app = await NestFactory.create(AppModule);
-
   const natsServers: string[] = process.env.NATS_SERVERS!.split(',');
 
-  app.connectMicroservice<MicroserviceOptions>(
+  const app = await NestFactory.createMicroservice<MicroserviceOptions>(
+    AppModule,
     {
       transport: Transport.NATS,
       options: {
         servers: natsServers,
       },
     },
-    { inheritAppConfig: true }, // * to inherit APP_FILTER
   );
 
   app.useGlobalPipes(
@@ -39,9 +37,12 @@ export async function bootstrap() {
     }),
   );
 
-  await app.startAllMicroservices();
-  await app.listen(1); // anti pattern
+  await app.listen();
   logger.log(`Main backend api running`);
+
+  // This is how microservices are hooked to Nats JetStream messages
+  const service = app.get<NatsJetStreamService>(NatsJetStreamService);
+  await service.initConsumeMessagesCycle();
 }
 
 void bootstrap();

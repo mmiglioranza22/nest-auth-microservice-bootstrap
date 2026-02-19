@@ -9,13 +9,27 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger as NestLogger } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 const isNotProd = process.env.NODE_ENV !== 'production';
 
 export async function bootstrap() {
   const logger = new NestLogger('Auth-ms');
 
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  app.disable('x-powered-by');
+
+  const server = app.getHttpAdapter().getInstance();
+
+  server.disable('etag');
+
+  // * Block all requests
+  server.use((req, res, next) => {
+    if (req.method === 'GET' && req.path === '/.well-known/jwks.json') {
+      return next();
+    }
+    return res.status(404).end();
+  });
 
   const natsServers: string[] = process.env.NATS_SERVERS!.split(',');
 

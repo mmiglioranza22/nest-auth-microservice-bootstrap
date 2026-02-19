@@ -64,7 +64,6 @@ export class RpcGlobalExceptionFilter extends BaseRpcExceptionFilter<any> {
         timestamp: new Date().toISOString(),
         constructor: exception?.constructor,
       });
-      this.logger.info(exception instanceof NatsError);
       this.logger.error(exception);
 
       // console.log(Object.entries(exception as Record<any, any>));
@@ -84,8 +83,8 @@ export class RpcGlobalExceptionFilter extends BaseRpcExceptionFilter<any> {
     }
 
     // * Nats errors
-
     if (exception instanceof NatsError) {
+      this.logger.info(exception instanceof NatsError);
       console.log({ exception });
       // todo test with client-gateway running
     }

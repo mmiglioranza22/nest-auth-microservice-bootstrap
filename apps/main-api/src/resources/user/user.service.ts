@@ -51,11 +51,6 @@ export class UserService implements OnModuleInit, OnApplicationBootstrap {
     this.natsJetStreamService.registerHook(this.handleNatsMessage.bind(this));
   }
 
-  async dumbTest() {
-    console.log('dumb test');
-    return 'ok';
-  }
-
   async createUser(
     { password, roles, ...rest }: CreateUserDTO,
     agent?: RequestAgent,

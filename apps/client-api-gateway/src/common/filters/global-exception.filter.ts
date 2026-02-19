@@ -111,8 +111,6 @@ export class GlobalExceptionsFilter extends BaseExceptionFilter<any> {
       errorResponse.details = { code: exception.code };
     }
 
-    console.log(exception);
-
     if (exception instanceof HttpException) {
       // * Redis error catched here for the time being
       super.catch(exception, host); // TODO actually this should be the default if any other case does not match, refactor to move it to the end

@@ -5,6 +5,7 @@ import { HttpAdapterHost } from '@nestjs/core';
 import {
   Inject,
   Injectable,
+  OnModuleInit,
   Optional,
   type OnApplicationBootstrap,
   type OnModuleDestroy,
@@ -36,7 +37,7 @@ import type { NatsJetStreamModuleOptions } from './nats-jetstream-module-options
 
 @Injectable()
 export class NatsJetStreamService
-  implements OnModuleDestroy, OnApplicationBootstrap
+  implements OnModuleInit, OnModuleDestroy, OnApplicationBootstrap
 {
   private natsConnection: NatsConnection;
   private jsClient: JetStreamClient;
@@ -64,14 +65,16 @@ export class NatsJetStreamService
     this.hooks.push(fn);
   }
 
-  async onApplicationBootstrap() {
+  async onModuleInit() {
     await this.clientProxy.connect();
     this.natsConnection = this.clientProxy.unwrap<NatsConnection>();
     this.jsClient = this.natsConnection.jetstream();
     this.jsManager = await this.jsClient.jetstreamManager(); // jetstream should be enabled beforehand in your nats server config (docker, etc)
 
     await this.initProvisionedNatsConfig();
+  }
 
+  onApplicationBootstrap() {
     if (this.hostAdapter.httpAdapter !== null) {
       this.logger.info(
         `${NatsJetStreamService.name} used in hybrid application. Subscribing to host adapter events...`,
