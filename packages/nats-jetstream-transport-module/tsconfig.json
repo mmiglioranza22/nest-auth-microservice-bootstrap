@@ -22,10 +22,12 @@
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
 
+    "outDir": "./dist",
+    "rootDir": "./src",
     "composite": true,
     "declaration": true,
     "declarationMap": true,
-    "outDir": "./dist"
+    "emitDeclarationOnly": false
   },
-  "include": ["src"]
+  "include": ["src/**/*"]
 }

@@ -11,8 +11,6 @@ import { AppModule } from './app.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
-import {} from '@packages/nats-jetstream-transport-module';
-
 const isNotProd = process.env.NODE_ENV !== 'production';
 
 export async function bootstrap() {

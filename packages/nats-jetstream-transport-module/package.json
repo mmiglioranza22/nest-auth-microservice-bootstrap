@@ -4,6 +4,7 @@
   "description": "NestJS Nats JetStream transport module",
   "author": "Manuel Miglioranza",
   "private": true,
+  "license": "MIT",
   "keywords": [
     "nestjs",
     "transport",
@@ -12,7 +13,6 @@
     "consumers",
     "streams"
   ],
-  "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
