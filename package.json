@@ -11,7 +11,8 @@
   "dependencies": {
     "@apps/client-api-gateway": "workspace:*",
     "@apps/auth-ms": "workspace:*",
-    "@apps/main-api": "workspace:*"
+    "@apps/main-api": "workspace:*",
+    "@packages/nats-jetstream-transport-module": "workspace:*"
   },
   "keywords": [],
   "author": "",

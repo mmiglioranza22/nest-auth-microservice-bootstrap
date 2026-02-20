@@ -20,6 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@packages/nats-jetstream-transport-module": "workspace:*",
     "@dotenvx/dotenvx": "^1.52.0",
     "@grpc/grpc-js": "^1.14.3",
     "@nestjs/common": "^11.0.1",
@@ -51,6 +52,7 @@
     "uuid": "^13.0.0"
   },
   "devDependencies": {
+    "@packages/nats-jetstream-transport-module": "workspace:*",
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.18.0",
     "@nestjs/cli": "^11.0.0",
