@@ -25,7 +25,7 @@ import { JwksController } from './jwks.controller';
       useFactory: (configService: ConfigService<EnvVariables>) => {
         return {
           privateKey: readFileSync(
-            join(__dirname, '../../../public/certs/private.pem'),
+            join(__dirname, '../../../public/certs/private.pem'), // * ideally read this from infra config, pipeline or env variable
             'utf8',
           ),
           signOptions: {

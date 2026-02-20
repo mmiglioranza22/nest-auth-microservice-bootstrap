@@ -32,7 +32,8 @@ import { VerifyAccountDTO } from './dto/request/verify-account.dto';
 import { AuthUser } from 'src/resources/auth/modules/auth-user/entities/auth-user.entity';
 import { UserRole } from 'src/resources/auth/modules/role/enum/user-role.enum';
 import { checkHash, generateHash, generateRandomUUID } from 'src/utils';
-import { NatsJetStreamService } from 'src/infra/transport/nats-jetstream.service';
+import { NatsJetStreamService } from '@packages/nats-jetstream-transport-module';
+// import { NatsJetStreamService } from 'src/infra/transport/nats-jetstream.service';
 
 //  RULE OF THUMB: Clear cache / tokens if we know the flow assures is the actual user doing that action (not a malicious one abusing public endpoints)
 // wherever token are created/updated/deleted in db, do accordingly in cache and cookies

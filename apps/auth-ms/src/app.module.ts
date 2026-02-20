@@ -9,7 +9,7 @@ import { LoggerModule } from './infra/logging/logger.module';
 import { SeedModule } from './_seed/seed.module';
 import { APP_FILTER } from '@nestjs/core';
 import { RpcGlobalExceptionFilter } from './filters/rpc-global-exception.filter';
-import { NatsJetStreamModule } from './infra/transport/nats-jetstream.module';
+import { NatsJetStreamModule } from '@packages/nats-jetstream-transport-module';
 import { NATS_SERVICE } from './infra/constants/services';
 import { ClientProxy, ClientsModule, Transport } from '@nestjs/microservices';
 import { EnvVariables } from 'config/env-variables';

@@ -1,13 +1,11 @@
 // * Mind for response object: why we user passthrough  https://docs.nestjs.com/controllers#library-specific-approach
 // Nextjs cookie https://www.youtube.com/watch?v=2ZEFTpchGZo
-import * as Constants from './constants';
-import { Response } from 'express';
+
 import { Controller } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { type EnvVariables } from 'config/env-variables';
 
 import { AuthService } from './auth.service';
-// import { CsrfTokenService } from './modules/csrf-token/csrf-token.service';
 
 import { LoginUserDTO } from './dto/request/login-user.dto';
 import { SignUpUserDTO } from './dto/request/signup-user.dto';
@@ -16,32 +14,17 @@ import { LoginSlugDTO } from './dto/request/login-slug.dto';
 import { ResetPasswordDTO } from './dto/request/reset-password.dto';
 import { VerifyAccountDTO } from './dto/request/verify-account.dto';
 
-// import { type SignedCookies } from './interfaces/signed-cookies.interface';
 import { type RequestAgent } from './interfaces/request-agent.interface';
-// import { UserRole } from 'src/resources/auth/modules/role/enum/user-role.enum';
-// import { AuthorizedRoles } from './decorators/authorized-roles/authorized-roles.decorator';
-// import { GetUser } from './decorators/get-user/get-user.decorator';
-// import { Cookies } from './decorators/cookies/cookies.decorator';
-// import { CsrfCheck } from './decorators/csrf-check/csrf-check.decorator';
-// import { Private } from './guards/private/private.decorator';
-// import { ApiTags } from '@nestjs/swagger';
-// import { API_TAG } from 'src/swagger/constants';
 
 import {
-  ClientProxy,
   Ctx,
   EventPattern,
   MessagePattern,
   NatsContext,
   Payload,
 } from '@nestjs/microservices';
-import { Observable } from 'rxjs';
-import { UserTokens } from './interfaces/user-tokens.interface';
-import { NatsJetStreamService } from 'src/infra/transport/nats-jetstream.service';
-import type { JsMsg } from 'nats';
 
-// import { NATS_SERVICE } from 'src/infra/constants/services';
-// import { firstValueFrom } from 'rxjs';
+import { UserTokens } from './interfaces/user-tokens.interface';
 
 // * Auth to be moved
 // @ApiTags(API_TAG.Auth.name)
@@ -50,31 +33,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly configService: ConfigService<EnvVariables>,
-    private readonly natsJetStreamService: NatsJetStreamService,
   ) {}
-
-  // @Post('test/jetstream/publish')
-  // async testPublish(@Body() payload: any) {
-  //   await this.natsJetStreamService.publishEvent(
-  //     'auth.user.hola',
-  //     'dalebocass',
-  //   );
-  // }
-  // TEST JETSTREAMS (from client gateway)
-  // @MessagePattern('test.jetstream.publish') // * This is required exlusively for delivery
-  // async testConsume(@Payload() payload: any, @Ctx() context: NatsContext) {
-  //   try {
-  //     console.log({ payload, context });
-  //     await this.natsJetStreamService.publishEvent(
-  //       'auth.user.hola',
-  //       'dalebocass',
-  //     );
-
-  //     return 'ok';
-  //   } catch (err: unknown) {
-  //     console.log(err);
-  //   }
-  // }
 
   // ? ___ Messages ___
 

@@ -6,7 +6,7 @@ services:
     restart: always
     container_name: postgres-api-db
     ports:
-      - "5432:5432"
+      - "5432:5432" # mind different hostport from auth db
     env_file:
       - ./config/.env.development
     environment:

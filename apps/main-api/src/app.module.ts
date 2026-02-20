@@ -1,12 +1,19 @@
 import { Module } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
-import { ConfigModule, ConfigModuleOptions } from '@nestjs/config';
+import {
+  ConfigModule,
+  ConfigModuleOptions,
+  ConfigService,
+} from '@nestjs/config';
 import { DatabaseModule } from './infra/database/database.module';
 import { UserModule } from './resources/user/user.module';
 import { SeedModule } from './_seed/seed.module';
 import { LoggerModule } from './infra/logging/logger.module';
 import { RpcGlobalExceptionFilter } from './filters/rpc-global-exception.filter';
-import { NatsJetStreamModule } from './infra/transport/nats-jetstream.module';
+import { NatsJetStreamModule } from '@packages/nats-jetstream-transport-module';
+import { ClientProxy, ClientsModule, Transport } from '@nestjs/microservices';
+import { NATS_SERVICE } from './infra/constants/services';
+import { EnvVariables } from 'config/env-variables';
 
 const CONFIG_MODULE_OPTIONS: Record<string, ConfigModuleOptions> = {
   development: {
@@ -29,13 +36,39 @@ const CONFIG_MODULE_OPTIONS: Record<string, ConfigModuleOptions> = {
     }),
     LoggerModule,
     DatabaseModule,
+    ClientsModule.registerAsync({
+      isGlobal: true,
+      clients: [
+        {
+          inject: [ConfigService],
+          name: NATS_SERVICE,
+          useFactory: (configService: ConfigService<EnvVariables>) => {
+            const natsServers = configService.getOrThrow<string[]>(
+              'NATS_SERVERS',
+              {
+                infer: true,
+              },
+            );
+            return {
+              transport: Transport.NATS,
+              options: {
+                servers: natsServers,
+              },
+            };
+          },
+        },
+      ],
+    }),
     NatsJetStreamModule.forRootAsync({
-      useFactory: () => {
+      inject: [NATS_SERVICE],
+      useFactory: (clientProxy: ClientProxy, configService: ConfigService) => {
         return {
           streamName: 'USERS',
           consumerName: 'MAIN_API_USER_CONSUMER',
           filterSubject: 'auth.user.*',
           messageHandler: () => console.log('done messagehandler2'),
+          clientProxy: clientProxy,
+          configService: configService,
         };
       },
     }),

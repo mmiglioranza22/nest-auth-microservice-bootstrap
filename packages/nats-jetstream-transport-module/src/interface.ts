@@ -7,8 +7,7 @@ export interface NatsJetStreamModuleOptions {
   clientName?: string;
   streamName: string;
   consumerName: string;
-  filterSubject: string;
-  messageHandler?: (payload?: any) => void | Promise<void>; // todo check this
+  filterSubject: string; // * THIS SHOULD MATCH EACH PARTICULAR CONSUMER FILTER SUBJECT
   clientProxy: ClientProxy;
   configService: ConfigService;
 }

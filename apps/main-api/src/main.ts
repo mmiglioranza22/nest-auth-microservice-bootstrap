@@ -10,7 +10,7 @@ import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { ValidationPipe, Logger as NestLogger } from '@nestjs/common';
 import { AppModule } from './app.module';
-import { NatsJetStreamService } from './infra/transport/nats-jetstream.service';
+import { NatsJetStreamService } from '@packages/nats-jetstream-transport-module';
 
 const isNotProd = process.env.NODE_ENV !== 'production';
 

@@ -27,7 +27,7 @@ import { UserRole } from 'src/resources/auth/modules/role/enum/user-role.enum';
 import { Role } from 'src/resources/auth/modules/role/entities/role.entity';
 import { RoleService } from 'src/resources/auth/modules/role/role.service';
 import { BadRequestRpcException } from '../../common/exceptions/bad-request-rpc.exception';
-import { NatsJetStreamService } from 'src/infra/transport/nats-jetstream.service';
+import { NatsJetStreamService } from '@packages/nats-jetstream-transport-module';
 
 @Injectable()
 export class UserService implements OnModuleInit, OnApplicationBootstrap {
@@ -37,9 +37,7 @@ export class UserService implements OnModuleInit, OnApplicationBootstrap {
     private readonly natsJetStreamService: NatsJetStreamService,
   ) {}
 
-  onApplicationBootstrap() {
-    console.log('post listen?');
-  }
+  onApplicationBootstrap() {}
 
   handleNatsMessage(payload: any) {
     console.log({ payload });
