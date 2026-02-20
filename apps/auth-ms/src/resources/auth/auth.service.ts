@@ -50,14 +50,17 @@ export class AuthService implements OnModuleInit {
     private readonly natsJetStreamService: NatsJetStreamService,
   ) {}
 
-  handleNatsMessage(payload: any) {
+  handleNatsJetstreamMessages(payload: any) {
     console.log({ payload });
     console.log('hellor from auth service method');
   }
 
   onModuleInit() {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    this.natsJetStreamService.registerHook(this.handleNatsMessage.bind(this));
+    // * Bind methods that should be called when a NATS sends a message through jetstream (outbox pattern)
+    this.natsJetStreamService.registerHook(
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      this.handleNatsJetstreamMessages.bind(this),
+    );
   }
 
   async signupUser(signUpUserDto: SignUpUserDTO): Promise<void> {

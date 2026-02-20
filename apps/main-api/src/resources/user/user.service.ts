@@ -45,6 +45,7 @@ export class UserService implements OnModuleInit, OnApplicationBootstrap {
   }
 
   onModuleInit() {
+    // * For now only 1 hook can be attached
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     this.natsJetStreamService.registerHook(this.handleNatsMessage.bind(this));
   }

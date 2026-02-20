@@ -10,4 +10,12 @@ export interface NatsJetStreamModuleOptions {
   filterSubject: string; // * THIS SHOULD MATCH EACH PARTICULAR CONSUMER FILTER SUBJECT
   clientProxy: ClientProxy;
   configService: ConfigService;
+  autoAck?: boolean; // Default is true. All consumers acknowledge messages as these are consumed.
+  rawJsMsg?: boolean; // By default is false. Message is sent parsed.
+}
+
+export interface NatsJetStreamMessage {
+  data?: JSON | string;
+  subject?: string;
+  ack?: () => void;
 }

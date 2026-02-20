@@ -25,10 +25,12 @@ import {
 } from "nats";
 
 import { PinoLogger } from "nestjs-pino";
-import { ConfigService } from "@nestjs/config";
 
 import { NATS_JETSTREAM_OPTIONS } from "./tokens";
-import { type NatsJetStreamModuleOptions } from "./interface";
+import {
+  NatsJetStreamMessage,
+  type NatsJetStreamModuleOptions,
+} from "./interface";
 
 @Injectable()
 export class NatsJetStreamService
@@ -43,11 +45,10 @@ export class NatsJetStreamService
   private readonly codec: Codec<JSON>;
 
   constructor(
-    private readonly logger: PinoLogger,
-    private readonly configService: ConfigService,
-    private readonly hostAdapter: HttpAdapterHost,
     @Inject(NATS_JETSTREAM_OPTIONS)
     private readonly options: NatsJetStreamModuleOptions,
+    private readonly hostAdapter: HttpAdapterHost,
+    private readonly logger: PinoLogger,
   ) {
     this.streams = new Map();
     this.consumers = new Map();
@@ -136,7 +137,8 @@ export class NatsJetStreamService
     }
   }
 
-  // Example function to subscribe to a stream and handle messages
+  // * filter subject done on the config level
+  // TODO For now only one hook can be attached by service
   async initConsumeMessagesCycle() {
     if (this.consumers.has(this.options.consumerName)) {
       const messages = (await this.consumers
@@ -146,22 +148,30 @@ export class NatsJetStreamService
 
       try {
         //  TODO messages should be already deduped here: check
-        // * filter subject done on the config level
-
         for await (const m of messages) {
-          // TODO once monorepo is set: try to implement first in main-api and create signup logic
           if (this.hooks.length > 0) {
+            console.log(m.subject);
+            console.log(m.seq);
+            console.log(m);
             // ? complete message can be sent and handle ack logic upstream
-            await this.hooks[0]({
-              data: this.codec.decode(m.data),
-              subject: m.subject,
-              ack: () => m.ack(),
-            });
+            if (this.options.rawJsMsg === true) {
+              const message: JsMsg = m;
+              await this.hooks[0](message);
+              if (this.options.autoAck === false) {
+                m.ack();
+              }
+            } else {
+              const message: NatsJetStreamMessage = {
+                data: this.codec.decode(m.data),
+                subject: m.subject,
+                ack: this.options.autoAck === true ? undefined : () => m.ack(),
+              };
+              await this.hooks[0](message);
+              if (this.options.autoAck === false) {
+                m.ack();
+              }
+            }
           }
-          console.log(m.subject);
-          console.log(m.seq);
-          // console.log({ data: this.codec.decode(m.data) });
-          m.ack();
         }
       } catch (err) {
         this.logger.error(`consume failed: ${err.message}`);

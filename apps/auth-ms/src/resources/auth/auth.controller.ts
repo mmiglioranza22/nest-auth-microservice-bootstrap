@@ -2,8 +2,6 @@
 // Nextjs cookie https://www.youtube.com/watch?v=2ZEFTpchGZo
 
 import { Controller } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { type EnvVariables } from 'config/env-variables';
 
 import { AuthService } from './auth.service';
 
@@ -30,10 +28,7 @@ import { UserTokens } from './interfaces/user-tokens.interface';
 // @ApiTags(API_TAG.Auth.name)
 @Controller()
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly configService: ConfigService<EnvVariables>,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   // ? ___ Messages ___
 

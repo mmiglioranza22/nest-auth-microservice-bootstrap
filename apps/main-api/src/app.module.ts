@@ -66,9 +66,10 @@ const CONFIG_MODULE_OPTIONS: Record<string, ConfigModuleOptions> = {
           streamName: 'USERS',
           consumerName: 'MAIN_API_USER_CONSUMER',
           filterSubject: 'auth.user.*',
-          messageHandler: () => console.log('done messagehandler2'),
           clientProxy: clientProxy,
           configService: configService,
+          // rawJsMsg: true,
+          // autoAck: false,
         };
       },
     }),

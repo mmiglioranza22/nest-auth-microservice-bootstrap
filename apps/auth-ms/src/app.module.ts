@@ -64,9 +64,9 @@ const CONFIG_MODULE_OPTIONS: Record<string, ConfigModuleOptions> = {
           streamName: 'USERS',
           consumerName: 'AUTH_MS_USERS_CONSUMER',
           filterSubject: 'app.user.*',
-          messageHandler: () => console.log('done messagehandler2'),
           clientProxy: clientProxy,
           configService: configService,
+          // rawJsMsg: true,
         };
       },
     }),
