@@ -52,7 +52,6 @@
     "uuid": "^13.0.0"
   },
   "devDependencies": {
-    "@packages/nats-jetstream-transport-module": "workspace:*",
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.18.0",
     "@nestjs/cli": "^11.0.0",
@@ -101,8 +100,5 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
-  },
-  "volta": {
-    "node": "24.13.0"
   }
 }

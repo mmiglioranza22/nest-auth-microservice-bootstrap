@@ -1,15 +1,14 @@
 packages:
-- apps/**
-- packages/**
-- tools/**
+  - apps/*
+  - packages/*
 
 onlyBuiltDependencies:
-- '@nestjs/core'
-- '@scarf/scarf'
-- '@swc/core'
-- bcrypt
-- cpu-features
-- esbuild
-- protobufjs
-- ssh2
-- unrs-resolver
+  - '@nestjs/core'
+  - '@scarf/scarf'
+  - '@swc/core'
+  - bcrypt
+  - cpu-features
+  - esbuild
+  - protobufjs
+  - ssh2
+  - unrs-resolver
