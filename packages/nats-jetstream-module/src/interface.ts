@@ -1,5 +1,5 @@
-import { ConfigService } from '@nestjs/config';
-import { ClientProxy } from '@nestjs/microservices';
+import { ConfigService } from "@nestjs/config";
+import { ClientProxy } from "@nestjs/microservices";
 
 // nats-stream.interfaces.ts
 export interface NatsJetStreamModuleOptions {

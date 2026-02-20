@@ -1,13 +1,13 @@
 // https://youtu.be/ChSVWDW-874?si=-5_Nliat49bTQESE
 // https://github.com/Redningsselskapet/nestjs-plugins/blob/master/packages/nestjs-nats-jetstream-transport/src/client.ts#L85
 //
-import { HttpAdapterHost } from '@nestjs/core';
+import { HttpAdapterHost } from "@nestjs/core";
 import {
   Inject,
   Injectable,
   type OnApplicationBootstrap,
   type OnModuleDestroy,
-} from '@nestjs/common';
+} from "@nestjs/common";
 
 import {
   JetStreamClient,
@@ -22,12 +22,13 @@ import {
   type JetStreamPublishOptions,
   type Payload,
   type JsMsg,
-} from 'nats';
+} from "nats";
 
-import { PinoLogger } from 'nestjs-pino';
-import { ConfigService } from '@nestjs/config';
-import { NATS_JETSTREAM_OPTIONS } from 'src/infra/transport/nats-jetstream.tokens';
-import { type NatsJetStreamModuleOptions } from 'src/infra/transport/nats-jetstream-module-options.interface';
+import { PinoLogger } from "nestjs-pino";
+import { ConfigService } from "@nestjs/config";
+
+import { NATS_JETSTREAM_OPTIONS } from "./tokens";
+import { type NatsJetStreamModuleOptions } from "./interface";
 
 @Injectable()
 export class NatsJetStreamService
@@ -36,16 +37,17 @@ export class NatsJetStreamService
   private natsConnection: NatsConnection;
   private jsClient: JetStreamClient;
   private jsManager: JetStreamManager;
+  private hooks: ((payload: any) => Promise<void>)[] = [];
   private readonly streams: Map<string, Stream>; // * no real need except for debugging and ensuring proper jetstream functionality for now. A object/map would be better
   private readonly consumers: Map<string, Consumer>; // * no real need except for debugging and ensuring proper jetstream functionality for now. A object/map would be better
   private readonly codec: Codec<JSON>;
-  private readonly hooks: ((payload: any) => Promise<void>)[] = [];
 
   constructor(
+    private readonly logger: PinoLogger,
+    private readonly configService: ConfigService,
+    private readonly hostAdapter: HttpAdapterHost,
     @Inject(NATS_JETSTREAM_OPTIONS)
     private readonly options: NatsJetStreamModuleOptions,
-    private readonly hostAdapter: HttpAdapterHost,
-    private readonly logger: PinoLogger,
   ) {
     this.streams = new Map();
     this.consumers = new Map();
@@ -170,7 +172,7 @@ export class NatsJetStreamService
   getNatsConnection(): NatsConnection {
     if (!this.natsConnection) {
       throw new Error(
-        'NATS client not initialized or connection not available.',
+        "NATS client not initialized or connection not available.",
       );
     }
     return this.natsConnection;
@@ -178,7 +180,7 @@ export class NatsJetStreamService
 
   getStreams(name: string): Stream | undefined {
     if (this.streams.size === 0) {
-      throw new Error('NATS stream not initialized.');
+      throw new Error("NATS stream not initialized.");
     }
 
     return this.streams.get(name);
@@ -186,7 +188,7 @@ export class NatsJetStreamService
 
   getConsumers(name: string): Consumer | undefined {
     if (this.consumers.size === 0) {
-      throw new Error('NATS consumer not initialized.');
+      throw new Error("NATS consumer not initialized.");
     }
 
     return this.consumers.get(name);
@@ -195,8 +197,8 @@ export class NatsJetStreamService
   // Usefull in case logs want to be disabled
   private get allowLogs() {
     return (
-      this.options.configService.get('NODE_ENV') !== 'production' &&
-      this.options.configService.get('NODE_ENV') !== 'ci'
+      this.options.configService.get("NODE_ENV") !== "production" &&
+      this.options.configService.get("NODE_ENV") !== "ci"
     );
   }
 }

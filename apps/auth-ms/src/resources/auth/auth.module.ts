@@ -16,8 +16,6 @@ import { OtpAuthenticationModule } from './modules/otp/otp-authentication.module
 
 import { AuthController } from './auth.controller';
 import { JwksController } from './jwks.controller';
-import { NatsJetStreamModule } from 'src/infra/transport/nats-jetstream.module';
-import { NATS_MESSAGE_HANDLER } from 'src/infra/transport/nats-jetstream.tokens';
 
 @Module({
   imports: [

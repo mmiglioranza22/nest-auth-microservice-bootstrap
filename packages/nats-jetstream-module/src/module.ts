@@ -3,17 +3,16 @@ import {
   Module,
   type DynamicModule,
   type Provider,
-} from '@nestjs/common';
-import { NatsJetStreamService } from './nats-jetstream.service';
-import type { NatsJetStreamModuleOptions } from './nats-jetstream-module-options.interface';
-import { NATS_JETSTREAM_OPTIONS } from './nats-jetstream.tokens';
+} from "@nestjs/common";
+import { NatsJetStreamService } from "./service";
+import type { NatsJetStreamModuleOptions } from "./interface";
+import { NATS_JETSTREAM_OPTIONS } from "./tokens";
 
 @Global()
 @Module({
   providers: [NatsJetStreamService],
   exports: [NatsJetStreamService],
 })
-// Jetstream config can be done here
 export class NatsJetStreamModule {
   static forRoot(options: NatsJetStreamModuleOptions): DynamicModule {
     return {
