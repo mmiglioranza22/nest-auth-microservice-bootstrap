@@ -2,6 +2,7 @@
   "name": "nest-auth-microservice-bootstrap",
   "version": "1.0.0",
   "description": "",
+  "private": true,
   "scripts": {
     "build": "pnpm -r run build",
     "start:dev": "pnpm --parallel run start:dev",

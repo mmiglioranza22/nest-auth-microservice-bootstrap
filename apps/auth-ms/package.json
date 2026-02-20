@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Auth microservice for NestJS microservices authentication and authorization template",
   "author": "Manuel Miglioranza",
-  "private": false,
+  "private": true,
   "license": "MIT",
   "scripts": {
     "build": "nest build",

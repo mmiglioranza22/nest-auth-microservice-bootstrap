@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "NestJS Nats JetStream transport module",
   "author": "Manuel Miglioranza",
+  "private": true,
   "keywords": [
     "nestjs",
     "transport",
