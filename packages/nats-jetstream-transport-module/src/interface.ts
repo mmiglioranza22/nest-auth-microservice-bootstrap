@@ -1,7 +1,6 @@
 import { ConfigService } from "@nestjs/config";
 import { ClientProxy } from "@nestjs/microservices";
 
-// nats-stream.interfaces.ts
 export interface NatsJetStreamModuleOptions {
   servers?: string[];
   clientName?: string;
@@ -10,12 +9,15 @@ export interface NatsJetStreamModuleOptions {
   filterSubject: string; // * THIS SHOULD MATCH EACH PARTICULAR CONSUMER FILTER SUBJECT
   clientProxy: ClientProxy;
   configService: ConfigService;
-  autoAck?: boolean; // Default is true. All consumers acknowledge messages as these are consumed.
-  rawJsMsg?: boolean; // By default is false. Message is sent parsed.
+  // When to ACK
+  // After successful processing: Only send an Ack() after the message has been successfully handled (e.g., written to a database, forwarded, or processed).
+  ackMessageInLoop?: boolean;
 }
 
+export type CodecType = Record<any, any>;
+
 export interface NatsJetStreamMessage {
-  data?: JSON | string;
   subject?: string;
   ack?: () => void;
+  [propName: string]: CodecType | string | (() => void) | undefined;
 }

@@ -68,8 +68,7 @@ const CONFIG_MODULE_OPTIONS: Record<string, ConfigModuleOptions> = {
           filterSubject: 'auth.user.*',
           clientProxy: clientProxy,
           configService: configService,
-          // rawJsMsg: true,
-          // autoAck: false,
+          ackMessageInLoop: false,
         };
       },
     }),

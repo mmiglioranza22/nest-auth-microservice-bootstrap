@@ -51,8 +51,8 @@ export class AuthService implements OnModuleInit {
   ) {}
 
   handleNatsJetstreamMessages(payload: any) {
-    console.log({ payload });
     console.log('hellor from auth service method');
+    console.log({ payload });
   }
 
   onModuleInit() {
@@ -76,7 +76,7 @@ export class AuthService implements OnModuleInit {
     console.log({ user });
     await this.natsJetStreamService.publishEvent(
       'auth.user.*',
-      JSON.stringify({ data: user }),
+      JSON.stringify(user),
     );
     // * could change if EVP gets passed (Email Verification Protocol)
     // await this.mailService.sendAccountVerification(user.email);

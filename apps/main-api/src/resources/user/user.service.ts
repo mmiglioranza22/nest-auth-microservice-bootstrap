@@ -27,7 +27,10 @@ import { UserRole } from 'src/resources/auth/modules/role/enum/user-role.enum';
 import { Role } from 'src/resources/auth/modules/role/entities/role.entity';
 import { RoleService } from 'src/resources/auth/modules/role/role.service';
 import { BadRequestRpcException } from '../../common/exceptions/bad-request-rpc.exception';
-import { NatsJetStreamService } from '@packages/nats-jetstream-transport-module';
+import {
+  NatsJetStreamMessage,
+  NatsJetStreamService,
+} from '@packages/nats-jetstream-transport-module';
 
 @Injectable()
 export class UserService implements OnModuleInit, OnApplicationBootstrap {
@@ -39,9 +42,11 @@ export class UserService implements OnModuleInit, OnApplicationBootstrap {
 
   onApplicationBootstrap() {}
 
-  handleNatsMessage(payload: any) {
-    console.log({ payload });
-    console.log('hellor from main api service method');
+  handleNatsMessage(message: NatsJetStreamMessage) {
+    console.log('MAIN API');
+    console.log(message);
+    console.log(Object.keys(message));
+    // console.log(JSON.parse(JSON.parse(message.string())));
   }
 
   onModuleInit() {

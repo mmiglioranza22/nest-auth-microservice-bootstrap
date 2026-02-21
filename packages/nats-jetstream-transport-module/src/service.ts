@@ -21,14 +21,14 @@ import {
   type ConsumerMessages,
   type JetStreamPublishOptions,
   type Payload,
-  type JsMsg,
 } from "nats";
 
 import { PinoLogger } from "nestjs-pino";
 
 import { NATS_JETSTREAM_OPTIONS } from "./tokens";
 import {
-  NatsJetStreamMessage,
+  CodecType,
+  type NatsJetStreamMessage,
   type NatsJetStreamModuleOptions,
 } from "./interface";
 
@@ -42,7 +42,7 @@ export class NatsJetStreamService
   private hooks: ((payload: any) => Promise<void>)[] = [];
   private readonly streams: Map<string, Stream>; // * no real need except for debugging and ensuring proper jetstream functionality for now. A object/map would be better
   private readonly consumers: Map<string, Consumer>; // * no real need except for debugging and ensuring proper jetstream functionality for now. A object/map would be better
-  private readonly codec: Codec<JSON>;
+  private readonly codec: Codec<CodecType>; // TODO Might not be the best type
 
   constructor(
     @Inject(NATS_JETSTREAM_OPTIONS)
@@ -120,11 +120,7 @@ export class NatsJetStreamService
       // todo headers should be set here somehow as an option OR pass as args for dedup
       // https://github.com/Redningsselskapet/nestjs-plugins/issues/45
       // https://nats.io/blog/new-per-subject-discard-policy/
-      return await this.jsClient.publish(
-        subject,
-        JSON.stringify(data),
-        options,
-      );
+      return await this.jsClient.publish(subject, data, options);
     } catch (error: unknown) {
       if (error instanceof NatsError) {
         console.log({
@@ -147,29 +143,33 @@ export class NatsJetStreamService
       this.logger.info(`${this.options.consumerName} listening to messages`);
 
       try {
-        //  TODO messages should be already deduped here: check
-        for await (const m of messages) {
+        //  TODO messages should be already deduped here: check!
+        for await (const message of messages) {
+          if (this.options.filterSubject !== message.subject) {
+            throw new Error("Your consumer is not subscribed to this subject");
+          }
           if (this.hooks.length > 0) {
-            console.log(m.subject);
-            console.log(m.seq);
-            console.log(m);
-            // ? complete message can be sent and handle ack logic upstream
-            if (this.options.rawJsMsg === true) {
-              const message: JsMsg = m;
-              await this.hooks[0](message);
-              if (this.options.autoAck === false) {
-                m.ack();
-              }
-            } else {
-              const message: NatsJetStreamMessage = {
-                data: this.codec.decode(m.data),
-                subject: m.subject,
-                ack: this.options.autoAck === true ? undefined : () => m.ack(),
-              };
-              await this.hooks[0](message);
-              if (this.options.autoAck === false) {
-                m.ack();
-              }
+            console.log(message.subject);
+            console.log(message.seq);
+            const message1: NatsJetStreamMessage = {
+              data: this.codec.decode(message.data),
+              subject: message.subject,
+              ack: () => {
+                if (this.options.ackMessageInLoop === false) {
+                  message.ack();
+                } else {
+                  console.log("Message acknowledged in loop");
+                }
+              },
+            };
+            await this.hooks[0](message1);
+
+            // * Default behaviour, ack messages in loop
+            if (
+              this.options.ackMessageInLoop === undefined ||
+              this.options.ackMessageInLoop === true
+            ) {
+              message.ack();
             }
           }
         }
