@@ -151,26 +151,12 @@ export class NatsJetStreamService
           if (this.hooks.length > 0) {
             console.log(message.subject);
             console.log(message.seq);
-            const message1: NatsJetStreamMessage = {
+            const decodedMessage: NatsJetStreamMessage = {
               data: this.codec.decode(message.data),
               subject: message.subject,
-              ack: () => {
-                if (this.options.ackMessageInLoop === false) {
-                  message.ack();
-                } else {
-                  console.log("Message acknowledged in loop");
-                }
-              },
+              ack: () => message.ack(), // * must be ack after processed manually for Explicit
             };
-            await this.hooks[0](message1);
-
-            // * Default behaviour, ack messages in loop
-            if (
-              this.options.ackMessageInLoop === undefined ||
-              this.options.ackMessageInLoop === true
-            ) {
-              message.ack();
-            }
+            await this.hooks[0](decodedMessage);
           }
         }
       } catch (err) {

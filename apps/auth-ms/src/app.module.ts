@@ -66,7 +66,6 @@ const CONFIG_MODULE_OPTIONS: Record<string, ConfigModuleOptions> = {
           filterSubject: 'app.user.*',
           clientProxy: clientProxy,
           configService: configService,
-          ackMessageInLoop: true,
         };
       },
     }),

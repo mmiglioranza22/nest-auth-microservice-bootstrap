@@ -46,6 +46,7 @@ export class UserService implements OnModuleInit, OnApplicationBootstrap {
     console.log('MAIN API');
     console.log(message);
     console.log(Object.keys(message));
+    message.ack();
     // console.log(JSON.parse(JSON.parse(message.string())));
   }
 
