@@ -56,10 +56,6 @@ export class NatsJetStreamService
     this.logger.setContext(NatsJetStreamService.name);
   }
 
-  registerHook(fn: () => Promise<void>) {
-    this.hooks.push(fn);
-  }
-
   async onApplicationBootstrap() {
     await this.options.clientProxy.connect();
     this.natsConnection = this.options.clientProxy.unwrap<NatsConnection>();
@@ -83,6 +79,14 @@ export class NatsJetStreamService
     }
   }
 
+  async onModuleDestroy() {
+    await this.natsConnection.drain(); // Drain the connection gracefully on application close
+  }
+
+  registerHook(fn: () => Promise<void>) {
+    this.hooks.push(fn);
+  }
+
   // * For simplicity, each microservice has 1 consumer in 1 stream (eventually it can be extended to N streams and consumers)
   async initProvisionedNatsConfig() {
     const [stream, consumer] = await Promise.all([
@@ -104,10 +108,6 @@ export class NatsJetStreamService
     this.logger.info(
       `${this.options.streamName} stream and ${this.options.consumerName} durable consumer set`,
     );
-  }
-
-  async onModuleDestroy() {
-    await this.natsConnection.drain(); // Drain the connection gracefully on application close
   }
 
   // Example function to publish a message to a stream

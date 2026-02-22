@@ -33,27 +33,29 @@ import {
 } from '@packages/nats-jetstream-transport-module';
 
 @Injectable()
-export class UserService implements OnModuleInit, OnApplicationBootstrap {
+export class UserService implements OnModuleInit {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly roleService: RoleService,
     private readonly natsJetStreamService: NatsJetStreamService,
   ) {}
 
-  onApplicationBootstrap() {}
-
-  handleNatsMessage(message: NatsJetStreamMessage) {
-    console.log('MAIN API');
-    console.log(message);
-    console.log(Object.keys(message));
-    message.ack();
-    // console.log(JSON.parse(JSON.parse(message.string())));
-  }
-
   onModuleInit() {
     // * For now only 1 hook can be attached
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     this.natsJetStreamService.registerHook(this.handleNatsMessage.bind(this));
+  }
+
+  // * Messages are sent from the auth microservice
+  private handleNatsMessage(message: NatsJetStreamMessage) {
+    console.log('MAIN API');
+    console.log(message);
+    // console.log(JSON.parse(JSON.parse(message.string())));
+    // * Switch (subject)
+    // Create, update, delete, update password, etc
+    // After successful processed (or error?), ack
+
+    message.ack();
   }
 
   async createUser(

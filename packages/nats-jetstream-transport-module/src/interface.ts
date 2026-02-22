@@ -7,11 +7,11 @@ export interface NatsJetStreamModuleOptions {
   streamName: string;
   consumerName: string;
   filterSubject: string; // * THIS SHOULD MATCH EACH PARTICULAR CONSUMER FILTER SUBJECT
-  clientProxy: ClientProxy;
+  clientProxy: ClientProxy; // Injected by ClientsModule
   configService: ConfigService;
 }
 
-export type CodecType = Record<any, any>;
+export type CodecType = Record<any, any>; // * Jetstream messages decode their data
 
 export interface NatsJetStreamMessage {
   subject?: string;
