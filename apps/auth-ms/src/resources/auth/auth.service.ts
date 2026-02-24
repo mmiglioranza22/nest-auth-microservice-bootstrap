@@ -1,5 +1,5 @@
 import * as ErrorMessages from 'src/common/constants/error-messages';
-import { Injectable, type OnModuleInit } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   JsonWebTokenError,
@@ -38,7 +38,7 @@ import { NatsJetStreamService } from '@packages/nats-jetstream-transport-module'
 //  RULE OF THUMB: Clear cache / tokens if we know the flow assures is the actual user doing that action (not a malicious one abusing public endpoints)
 // wherever token are created/updated/deleted in db, do accordingly in cache and cookies
 @Injectable()
-export class AuthService implements OnModuleInit {
+export class AuthService {
   constructor(
     private readonly authUserService: AuthUserService,
     private readonly jwtService: JwtService,
@@ -50,19 +50,6 @@ export class AuthService implements OnModuleInit {
     private readonly natsJetStreamService: NatsJetStreamService,
   ) {}
 
-  onModuleInit() {
-    // * Bind methods that should be called when a NATS sends a message through jetstream (outbox pattern)
-    this.natsJetStreamService.registerHook(
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      this.handleNatsJetstreamMessages.bind(this),
-    );
-  }
-
-  handleNatsJetstreamMessages(payload: any) {
-    console.log('hellor from auth service method');
-    console.log({ payload });
-  }
-
   async signupUser(signUpUserDto: SignUpUserDTO): Promise<void> {
     const draftUser = { ...signUpUserDto, roles: [UserRole.SYS_ADMIN] };
     const user = await this.authUserService.createUser(draftUser);
@@ -72,7 +59,7 @@ export class AuthService implements OnModuleInit {
     }
 
     // ! Keep CDC / OUTBOX pattern here
-    // Send message only if
+    // Send message only on succesfull insert/create
     await this.natsJetStreamService.publishEvent(
       'auth.user.signup',
       JSON.stringify({ ...draftUser, authUserId: user.id }),

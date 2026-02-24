@@ -38,12 +38,14 @@ export class UserService implements OnModuleInit {
   ) {}
 
   onModuleInit() {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    this.natsJetStreamService.registerHook(this.handleNatsMessage.bind(this));
+    this.natsJetStreamService.registerHook(
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      this.handleNatsJetstreamMessages.bind(this),
+    );
   }
 
   // * Messages are sent from the auth microservice
-  private async handleNatsMessage(
+  private async handleNatsJetstreamMessages(
     message: NatsJetStreamMessage<
       SignUpUserDTO & { roles: UserRole[]; authUserId: string }
     >,
@@ -74,6 +76,8 @@ export class UserService implements OnModuleInit {
     { password, roles, ...rest }: CreateUserDTO,
     agent?: RequestAgent,
   ): Promise<UserResponseDTO | null> {
+    // ? Pending implementation to skip if method is called due to receiving a message (to avoid infinite loop auth -> main -> auth ...)
+
     // * User / guest check. Auth user creation via signup should skip it
     if (agent) {
       const canPerformAction = checkAllowed_User_CreateAction(agent);
@@ -132,6 +136,7 @@ export class UserService implements OnModuleInit {
     }
 
     // * Only same user should be able to change password and email
+    // * email and password change made by other users (admins, sysadmins) fail silently
     if (user.id === agent.id) {
       await this.canUpdatePassword(user, password, oldPassword);
       if (password) {
@@ -143,7 +148,6 @@ export class UserService implements OnModuleInit {
         // ? can use mail service to inform email change
       }
     }
-    // * email and password change made by other users (admins, sysadmins) fail silently
 
     // * Role changes can be made only in specific cases, and as a rule of thumb, not to self
     user.roles = await this.updateTargetUserRoles(user, roles);
@@ -152,6 +156,13 @@ export class UserService implements OnModuleInit {
       ...user,
       ...rest,
     });
+
+    // ! Keep CDC / OUTBOX pattern here
+    // Send message only on succesfull insert/create
+    await this.natsJetStreamService.publishEvent(
+      'app.user.update',
+      JSON.stringify({ updatedUser, userId: user.id }),
+    );
 
     return updatedUser;
   }
