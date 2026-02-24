@@ -18,7 +18,6 @@ import {
   type NatsConnection,
   type Stream,
   type Consumer,
-  type ConsumerMessages,
   type JetStreamPublishOptions,
   type Payload,
 } from "nats";
@@ -157,6 +156,9 @@ export class NatsJetStreamService
                 data: this.codec.decode(message.data),
                 subject: message.subject,
                 ack: () => message.ack(), // * must be ack after processed manually for Explicit
+                nack: (millis) => message.nak(millis),
+                working: () => message.working(),
+                term: (reason) => message.term(reason),
               };
               this.hooks[0](decodedMessage);
             }

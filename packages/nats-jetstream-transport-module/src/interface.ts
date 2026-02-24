@@ -17,5 +17,7 @@ export interface NatsJetStreamMessage<T> {
   subject?: string;
   ack: () => void;
   data: T;
-  // [propName: string]: CodecType | string | (() => void) | undefined;
+  nack: (millis?: number) => void;
+  working: () => void;
+  term: (reason?: string) => void;
 }

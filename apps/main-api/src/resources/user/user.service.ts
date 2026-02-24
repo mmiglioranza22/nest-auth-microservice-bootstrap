@@ -1,10 +1,6 @@
 // https://stackoverflow.com/questions/59645009/how-to-return-only-some-columns-of-a-relations-with-typeorm
 import * as ErrorMessages from 'src/common/constants/error-messages';
-import {
-  Injectable,
-  OnApplicationBootstrap,
-  OnModuleInit,
-} from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -42,7 +38,6 @@ export class UserService implements OnModuleInit {
   ) {}
 
   onModuleInit() {
-    // * For now only 1 hook can be attached
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     this.natsJetStreamService.registerHook(this.handleNatsMessage.bind(this));
   }
@@ -53,28 +48,26 @@ export class UserService implements OnModuleInit {
       SignUpUserDTO & { roles: UserRole[]; authUserId: string }
     >,
   ) {
-    console.log('MAIN API');
-    console.log(message);
-
-    // * Switch (subject)
-    // Create, update, delete, update password, etc
-    // After successful processed (or error?), ack
-
-    switch (message.subject) {
-      case 'auth.user.signup':
-        await this.createUser(message.data);
-        break;
-      case 'auth.user.update':
-        console.log('update user in db');
-        break;
-      case 'auth.user.delete':
-        console.log('delete user in db');
-        break;
-      default:
-        throw new Error(`Unhandled message subject: ${message.subject}`);
+    try {
+      switch (message.subject) {
+        case 'auth.user.signup':
+          await this.createUser(message.data);
+          message.ack();
+          break;
+        case 'auth.user.update':
+          console.log('update user in db');
+          break;
+        case 'auth.user.delete':
+          console.log('delete user in db');
+          break;
+        default:
+          throw new Error(`Unhandled message subject: ${message.subject}`);
+      }
+    } catch (error: unknown) {
+      // * Depending on the error, nats server can either nack or use a custome logic to tell the server it still working on processing the message
+      message.term('Error on nats message handler');
+      throw error;
     }
-
-    message.ack();
   }
 
   async createUser(
