@@ -18,7 +18,6 @@ export class User {
 
   // TODO populate with outbox pattern
   @Column('uuid', { unique: true, nullable: true })
-  userId: string;
   authUserId: string;
 
   @Column('text')

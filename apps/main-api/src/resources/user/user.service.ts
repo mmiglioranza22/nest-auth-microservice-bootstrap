@@ -31,6 +31,7 @@ import {
   NatsJetStreamMessage,
   NatsJetStreamService,
 } from '@packages/nats-jetstream-transport-module';
+import { SignUpUserDTO } from '../auth/dto/request/signup-user.dto';
 
 @Injectable()
 export class UserService implements OnModuleInit {
@@ -47,13 +48,31 @@ export class UserService implements OnModuleInit {
   }
 
   // * Messages are sent from the auth microservice
-  private handleNatsMessage(message: NatsJetStreamMessage) {
+  private async handleNatsMessage(
+    message: NatsJetStreamMessage<
+      SignUpUserDTO & { roles: UserRole[]; authUserId: string }
+    >,
+  ) {
     console.log('MAIN API');
     console.log(message);
-    // console.log(JSON.parse(JSON.parse(message.string())));
+
     // * Switch (subject)
     // Create, update, delete, update password, etc
     // After successful processed (or error?), ack
+
+    switch (message.subject) {
+      case 'auth.user.signup':
+        await this.createUser(message.data);
+        break;
+      case 'auth.user.update':
+        console.log('update user in db');
+        break;
+      case 'auth.user.delete':
+        console.log('delete user in db');
+        break;
+      default:
+        throw new Error(`Unhandled message subject: ${message.subject}`);
+    }
 
     message.ack();
   }

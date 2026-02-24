@@ -35,6 +35,7 @@ export class AuthUserService {
     private readonly roleService: RoleService,
   ) {}
 
+  // * Interface of return type should be shared in basic props at least with main api UserService
   async createUser(
     { password, roles, ...rest }: CreateUserDTO,
     agent?: RequestAgent,

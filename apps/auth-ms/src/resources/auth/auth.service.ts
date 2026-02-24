@@ -50,11 +50,6 @@ export class AuthService implements OnModuleInit {
     private readonly natsJetStreamService: NatsJetStreamService,
   ) {}
 
-  handleNatsJetstreamMessages(payload: any) {
-    console.log('hellor from auth service method');
-    console.log({ payload });
-  }
-
   onModuleInit() {
     // * Bind methods that should be called when a NATS sends a message through jetstream (outbox pattern)
     this.natsJetStreamService.registerHook(
@@ -63,20 +58,24 @@ export class AuthService implements OnModuleInit {
     );
   }
 
+  handleNatsJetstreamMessages(payload: any) {
+    console.log('hellor from auth service method');
+    console.log({ payload });
+  }
+
   async signupUser(signUpUserDto: SignUpUserDTO): Promise<void> {
-    const user = await this.authUserService.createUser({
-      ...signUpUserDto,
-      roles: [UserRole.SYS_ADMIN],
-    });
+    const draftUser = { ...signUpUserDto, roles: [UserRole.SYS_ADMIN] };
+    const user = await this.authUserService.createUser(draftUser);
 
     if (!user) {
       throw new InternalServerRpcException(ErrorMessages.SIGNUP_ERROR);
     }
 
-    console.log({ user });
+    // ! Keep CDC / OUTBOX pattern here
+    // Send message only if
     await this.natsJetStreamService.publishEvent(
-      'auth.user.*',
-      JSON.stringify(user),
+      'auth.user.signup',
+      JSON.stringify({ ...draftUser, authUserId: user.id }),
     );
     // * could change if EVP gets passed (Email Verification Protocol)
     // await this.mailService.sendAccountVerification(user.email);
