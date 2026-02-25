@@ -17,7 +17,7 @@ This is the microservices version of [nestjs-auth-bootstrap](https://github.com/
 - pnpm workspace that handles three NestJS applications:
   - **main-api**: business application goes here (handle **users** as an example)
   - **client-api-gateway**: HTTP entry point for clients
-  - **auth-ms**: hybrid NestJS application for authentication logic ()
+  - **auth-ms**: hybrid NestJS application for authentication logic (asymmetric flow)
 - Database-per-service infrastructure
 - NATS Core used for internal application communication
 - NATS JetStream implementation as a shared package (**nats-jetstream-transport-module**)
