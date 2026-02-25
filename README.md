@@ -14,6 +14,12 @@ Pending work:
 
 This is the microservices version of [nestjs-auth-bootstrap](https://github.com/mmiglioranza22/nestjs-auth-bootstrap)
 
+## Why?
+
+Authentication with microservices can be a challenge and this can give you a mental model and practical example of how that can be achieved in NestJS.
+
+Note: NATS JetStream is not _required_ for this, yet it was developed with the intention of solving distributed system consistency that comes with any microservices architecture through the outbox pattern (i.e: creating a user in sign up -auth service database- should create a user in the main application's database). Other solutions can be adopted for this particular problem (change data capture), but outbox pattern fitted nicely and NATS JetStream was the go to solution for it, despite not being supported out of the box by the Nest team (awesome community [plugins](https://github.com/Redningsselskapet/nestjs-plugins/tree/master/packages/nestjs-nats-jetstream-transport) exist though, check them out).
+
 ## What's different?
 
 - pnpm workspace that handles three NestJS applications:
@@ -29,7 +35,7 @@ This is the microservices version of [nestjs-auth-bootstrap](https://github.com/
 
 ## Currently working OK
 
-- Interal communication between apps using NATS Core transport
+- Internal communication between apps using NATS Core transport
 - Authentication: Token rotation and invalidation at api gateway level (public and private keys must be created in `auth-ms/public/certs/` or configured at infrastructure level - docker secrets, env variables, etc. - for production level).
 - Authorization: role-based at api gateway level (guards, decorators)
 - Persistent message communication through NATS JetStream: Only happy path (Error handling to be implemented)
@@ -88,4 +94,4 @@ You need to seed apps before starting
 
 From the [postman collection Microservices version](https://www.postman.com/orbital-module-astronomer-66959558/workspace/nestjs-auth-bootstrap/collection/16327695-2963349f-906f-4faf-b25e-e7612d6de197?action=share&source=copy-link&creator=16327695), seed all apps (`/seed`)
 
-Once done and successful, you can login with the default user, sign in
+Once done and successful, you can login with the default user, sign in a new one (verification email sent to your mailbox sandbox)
