@@ -1,5 +1,7 @@
 # nats-jetstream-transport-module
 
+🚧 **WORK IN PROGRESS** 🚧
+
 Usecases
 
 Previous requirements (nats server, consumers, streams)
