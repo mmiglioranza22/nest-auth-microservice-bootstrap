@@ -18,7 +18,6 @@ import {
   type NatsConnection,
   type Stream,
   type Consumer,
-  type ConsumerMessages,
   type JetStreamPublishOptions,
   type Payload,
 } from "nats";
@@ -110,7 +109,6 @@ export class NatsJetStreamService
     );
   }
 
-  // Example function to publish a message to a stream
   async publishEvent(
     subject: string,
     data: Payload,
@@ -134,29 +132,36 @@ export class NatsJetStreamService
   }
 
   // * filter subject done on the config level
-  // TODO For now only one hook can be attached by service
+  // * For now only one hook can be attached by service
+  // ? On concurrency, check https://nats-io.github.io/nats.js/jetstream/index.html#iterators-callbacks-and-concurrency
   async initConsumeMessagesCycle() {
     if (this.consumers.has(this.options.consumerName)) {
-      const messages = (await this.consumers
+      const messages = await this.consumers
         .get(this.options.consumerName)
-        ?.consume()) as ConsumerMessages;
+        ?.consume();
       this.logger.info(`${this.options.consumerName} listening to messages`);
 
       try {
-        //  TODO messages should be already deduped here: check!
-        for await (const message of messages) {
-          if (this.options.filterSubject !== message.subject) {
-            throw new Error("Your consumer is not subscribed to this subject");
-          }
-          if (this.hooks.length > 0) {
-            console.log(message.subject);
-            console.log(message.seq);
-            const decodedMessage: NatsJetStreamMessage = {
-              data: this.codec.decode(message.data),
-              subject: message.subject,
-              ack: () => message.ack(), // * must be ack after processed manually for Explicit
-            };
-            await this.hooks[0](decodedMessage);
+        if (messages) {
+          for await (const message of messages) {
+            // if (this.options.filterSubject !== message.subject) {
+            //   throw new Error(
+            //     "Your consumer is not subscribed to this subject",
+            //   );
+            // }
+            if (this.hooks.length > 0) {
+              console.log(message.subject);
+              console.log(message.seq);
+              const decodedMessage: NatsJetStreamMessage<Record<any, any>> = {
+                data: this.codec.decode(message.data),
+                subject: message.subject,
+                ack: () => message.ack(), // * must be ack after processed manually for Explicit
+                nack: (millis) => message.nak(millis),
+                working: () => message.working(),
+                term: (reason) => message.term(reason),
+              };
+              this.hooks[0](decodedMessage);
+            }
           }
         }
       } catch (err) {

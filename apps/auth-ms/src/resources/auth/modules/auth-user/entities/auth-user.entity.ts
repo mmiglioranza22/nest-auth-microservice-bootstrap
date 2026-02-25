@@ -16,8 +16,8 @@ export class AuthUser {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  // @Column('uuid', { unique: true, nullable: true })
-  // userId: string;
+  @Column('uuid', { unique: true, nullable: true })
+  userId: string;
 
   @Column('text')
   name: string;

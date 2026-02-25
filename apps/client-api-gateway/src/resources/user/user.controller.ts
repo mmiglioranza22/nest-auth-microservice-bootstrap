@@ -30,7 +30,7 @@ import { Observable } from 'rxjs';
 export class UserController {
   constructor(@Inject(NATS_SERVICE) private readonly client: ClientProxy) {}
 
-  // @Protected()
+  @Protected()
   @Post()
   createUser(
     @Body() createUserDto: CreateUserDTO,

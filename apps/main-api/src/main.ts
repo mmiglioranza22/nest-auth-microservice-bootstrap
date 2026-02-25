@@ -40,7 +40,7 @@ export async function bootstrap() {
   await app.listen();
   logger.log(`Main backend api running`);
 
-  // This is how microservices are hooked to Nats JetStream messages
+  // * This is how microservices are hooked to Nats JetStream messages
   const service = app.get<NatsJetStreamService>(NatsJetStreamService);
   await service.initConsumeMessagesCycle();
 }

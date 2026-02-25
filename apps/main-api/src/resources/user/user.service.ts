@@ -1,10 +1,6 @@
 // https://stackoverflow.com/questions/59645009/how-to-return-only-some-columns-of-a-relations-with-typeorm
 import * as ErrorMessages from 'src/common/constants/error-messages';
-import {
-  Injectable,
-  OnApplicationBootstrap,
-  OnModuleInit,
-} from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -31,6 +27,7 @@ import {
   NatsJetStreamMessage,
   NatsJetStreamService,
 } from '@packages/nats-jetstream-transport-module';
+import { SignUpUserDTO } from '../auth/dto/request/signup-user.dto';
 
 @Injectable()
 export class UserService implements OnModuleInit {
@@ -41,27 +38,46 @@ export class UserService implements OnModuleInit {
   ) {}
 
   onModuleInit() {
-    // * For now only 1 hook can be attached
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    this.natsJetStreamService.registerHook(this.handleNatsMessage.bind(this));
+    this.natsJetStreamService.registerHook(
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      this.handleNatsJetstreamMessages.bind(this),
+    );
   }
 
   // * Messages are sent from the auth microservice
-  private handleNatsMessage(message: NatsJetStreamMessage) {
-    console.log('MAIN API');
-    console.log(message);
-    // console.log(JSON.parse(JSON.parse(message.string())));
-    // * Switch (subject)
-    // Create, update, delete, update password, etc
-    // After successful processed (or error?), ack
-
-    message.ack();
+  private async handleNatsJetstreamMessages(
+    message: NatsJetStreamMessage<
+      SignUpUserDTO & { roles: UserRole[]; authUserId: string }
+    >,
+  ) {
+    try {
+      switch (message.subject) {
+        case 'auth.user.signup':
+          await this.createUser(message.data);
+          message.ack();
+          break;
+        case 'auth.user.update':
+          console.log('update user in db');
+          break;
+        case 'auth.user.delete':
+          console.log('delete user in db');
+          break;
+        default:
+          throw new Error(`Unhandled message subject: ${message.subject}`);
+      }
+    } catch (error: unknown) {
+      // * Depending on the error, nats server can either nack or use a custome logic to tell the server it still working on processing the message
+      message.term('Error on nats message handler');
+      throw error;
+    }
   }
 
   async createUser(
     { password, roles, ...rest }: CreateUserDTO,
     agent?: RequestAgent,
   ): Promise<UserResponseDTO | null> {
+    // ? Pending implementation to skip if method is called due to receiving a message (to avoid infinite loop auth -> main -> auth ...)
+
     // * User / guest check. Auth user creation via signup should skip it
     if (agent) {
       const canPerformAction = checkAllowed_User_CreateAction(agent);
@@ -120,6 +136,7 @@ export class UserService implements OnModuleInit {
     }
 
     // * Only same user should be able to change password and email
+    // * email and password change made by other users (admins, sysadmins) fail silently
     if (user.id === agent.id) {
       await this.canUpdatePassword(user, password, oldPassword);
       if (password) {
@@ -131,7 +148,6 @@ export class UserService implements OnModuleInit {
         // ? can use mail service to inform email change
       }
     }
-    // * email and password change made by other users (admins, sysadmins) fail silently
 
     // * Role changes can be made only in specific cases, and as a rule of thumb, not to self
     user.roles = await this.updateTargetUserRoles(user, roles);
@@ -140,6 +156,13 @@ export class UserService implements OnModuleInit {
       ...user,
       ...rest,
     });
+
+    // ! Keep CDC / OUTBOX pattern here
+    // Send message only on succesfull insert/create
+    await this.natsJetStreamService.publishEvent(
+      'app.user.update',
+      JSON.stringify({ updatedUser, userId: user.id }),
+    );
 
     return updatedUser;
   }

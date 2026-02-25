@@ -1,6 +1,6 @@
 // https://stackoverflow.com/questions/59645009/how-to-return-only-some-columns-of-a-relations-with-typeorm
 import * as ErrorMessages from 'src/common/constants/error-messages';
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AuthUser } from './entities/auth-user.entity';
@@ -24,17 +24,60 @@ import { UserRole } from 'src/resources/auth/modules/role/enum/user-role.enum';
 import { Role } from 'src/resources/auth/modules/role/entities/role.entity';
 import { RoleService } from 'src/resources/auth/modules/role/role.service';
 import { BadRequestRpcException } from 'src/common/exceptions/bad-request-rpc.exception';
+import {
+  NatsJetStreamMessage,
+  NatsJetStreamService,
+} from '@packages/nats-jetstream-transport-module';
+import { SignUpUserDTO } from '../../dto/request/signup-user.dto';
 
 type Slug = keyof Pick<AuthUser, 'email' | 'username'>;
 
 @Injectable()
-export class AuthUserService {
+export class AuthUserService implements OnModuleInit {
   constructor(
     @InjectRepository(AuthUser)
     private readonly authUserRepository: Repository<AuthUser>,
     private readonly roleService: RoleService,
+    private readonly natsJetStreamService: NatsJetStreamService,
   ) {}
 
+  onModuleInit() {
+    // * Bind methods that should be called when a NATS sends a message through jetstream (outbox pattern)
+    this.natsJetStreamService.registerHook(
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      this.handleNatsJetstreamMessages.bind(this),
+    );
+  }
+
+  // * Messages are sent from the auth microservice
+  private async handleNatsJetstreamMessages(
+    message: NatsJetStreamMessage<
+      SignUpUserDTO & { roles: UserRole[]; authUserId: string }
+    >,
+  ) {
+    try {
+      switch (message.subject) {
+        case 'app.user.signup':
+          await this.createUser(message.data);
+          message.ack();
+          break;
+        case 'app.user.update':
+          console.log('update user in db');
+          break;
+        case 'app.user.delete':
+          console.log('delete user in db');
+          break;
+        default:
+          throw new Error(`Unhandled message subject: ${message.subject}`);
+      }
+    } catch (error: unknown) {
+      // * Depending on the error, nats server can either nack or use a custome logic to tell the server it still working on processing the message
+      message.term('Error on nats message handler');
+      throw error;
+    }
+  }
+
+  // * Interface of return type should be shared in basic props at least with main api UserService
   async createUser(
     { password, roles, ...rest }: CreateUserDTO,
     agent?: RequestAgent,

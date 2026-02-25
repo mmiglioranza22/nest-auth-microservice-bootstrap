@@ -13,8 +13,11 @@ export interface NatsJetStreamModuleOptions {
 
 export type CodecType = Record<any, any>; // * Jetstream messages decode their data
 
-export interface NatsJetStreamMessage {
+export interface NatsJetStreamMessage<T> {
   subject?: string;
   ack: () => void;
-  [propName: string]: CodecType | string | (() => void) | undefined;
+  data: T;
+  nack: (millis?: number) => void;
+  working: () => void;
+  term: (reason?: string) => void;
 }

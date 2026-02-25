@@ -5,13 +5,17 @@ import { CreateUserDTO } from './dto/create-user.dto';
 import { UpdateUserDTO } from './dto/update-user.dto';
 import { UserResponseDTO } from './dto/user-response.dto';
 import { type RequestAgent } from 'src/common/interfaces/request-agent.interface';
+import { NatsJetStreamService } from '@packages/nats-jetstream-transport-module';
 
 @Controller()
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly natsJetStreamService: NatsJetStreamService,
+  ) {}
 
   @MessagePattern('user.create')
-  createUser(
+  async createUser(
     @Payload()
     {
       createUserDto,
@@ -21,7 +25,16 @@ export class UserController {
       agent: RequestAgent;
     },
   ): Promise<UserResponseDTO | null> {
-    return this.userService.createUser(createUserDto, agent);
+    const user = await this.userService.createUser(createUserDto, agent);
+
+    if (user) {
+      await this.natsJetStreamService.publishEvent(
+        'app.user.signup',
+        JSON.stringify({ ...createUserDto, userId: user.id }),
+      );
+    }
+
+    return user;
   }
 
   @MessagePattern('user.find.all')
