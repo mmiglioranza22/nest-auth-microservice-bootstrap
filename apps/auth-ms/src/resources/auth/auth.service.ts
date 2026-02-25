@@ -58,14 +58,14 @@ export class AuthService {
       throw new InternalServerRpcException(ErrorMessages.SIGNUP_ERROR);
     }
 
-    // ! Keep CDC / OUTBOX pattern here
+    // ! Keep OUTBOX pattern here
     // Send message only on succesfull insert/create
     await this.natsJetStreamService.publishEvent(
       'auth.user.signup',
       JSON.stringify({ ...draftUser, authUserId: user.id }),
     );
     // * could change if EVP gets passed (Email Verification Protocol)
-    // await this.mailService.sendAccountVerification(user.email);
+    await this.mailService.sendAccountVerification(user.email);
   }
 
   async verifyAccount({ email, code }: VerifyAccountDTO): Promise<void> {

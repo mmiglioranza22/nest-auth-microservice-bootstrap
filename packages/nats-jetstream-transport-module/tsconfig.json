@@ -29,5 +29,5 @@
     "declarationMap": true,
     "emitDeclarationOnly": false
   },
-  "include": ["src/**/*"]
+  "include": ["src"]
 }

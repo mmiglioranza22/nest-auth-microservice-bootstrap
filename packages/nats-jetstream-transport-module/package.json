@@ -19,7 +19,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsc --outDir ./dist",
     "clean": "rimraf dist"
   },
   "dependencies": {

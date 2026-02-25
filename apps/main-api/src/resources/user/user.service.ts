@@ -157,7 +157,7 @@ export class UserService implements OnModuleInit {
       ...rest,
     });
 
-    // ! Keep CDC / OUTBOX pattern here
+    // ! Keep OUTBOX pattern here
     // Send message only on succesfull insert/create
     await this.natsJetStreamService.publishEvent(
       'app.user.update',
