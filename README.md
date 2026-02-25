@@ -25,8 +25,9 @@ This is the microservices version of [nestjs-auth-bootstrap](https://github.com/
 - NATS JetStream implementation as a shared package `nats-jetstream-transport-module`
 - RS256 public-private-key authentication implementation using `jose` and `jwks-rsa` with token rotation and public key discovery (/.well-known/jwks.json). Refresh token signed with regular HS256 algorithm (secret).
 - Specific Postman collection (only difference is the public key certs route and folder organization)
+- [Auth cycle](https://github.com/mmiglioranza22/nestjs-auth-bootstrap?tab=readme-ov-file#auth-cycle) is essentially the same from the client POV. Only difference is that internally all authorization logic is done by the authentication microservice (better scalability), keeping in sync with the api gateway all refresh tokens with the shared Redis instance. Authentication and authorization guards are implemented by the api gateway (although it can be more fine grained in each microservice if wished so).
 
-## Currently working
+## Currently working OK
 
 - Interal communication between apps using NATS Core transport
 - Authentication: Token rotation and invalidation at api gateway level (public and private keys must be created in `auth-ms/public/certs/` or configured at infrastructure level - docker secrets, env variables, etc. - for production level).

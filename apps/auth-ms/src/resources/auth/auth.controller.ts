@@ -14,13 +14,7 @@ import { VerifyAccountDTO } from './dto/request/verify-account.dto';
 
 import { type RequestAgent } from './interfaces/request-agent.interface';
 
-import {
-  Ctx,
-  EventPattern,
-  MessagePattern,
-  NatsContext,
-  Payload,
-} from '@nestjs/microservices';
+import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
 
 import { UserTokens } from './interfaces/user-tokens.interface';
 
@@ -34,10 +28,7 @@ export class AuthController {
 
   // * ____ PUBLIC ____
   @EventPattern('auth.signup.user')
-  async signup(
-    @Payload() signUpUserDto: SignUpUserDTO,
-    @Ctx() context: NatsContext,
-  ): Promise<void> {
+  async signup(@Payload() signUpUserDto: SignUpUserDTO): Promise<void> {
     await this.authService.signupUser(signUpUserDto);
   }
 

@@ -89,7 +89,6 @@ export class AuthService {
       );
     }
     await this.authUserService.verifyUserAccount(user);
-    // await this.mailService.accountConfirmation(user) // TODO
   }
 
   async loginUser(loginUserDto: LoginUserDTO): Promise<UserTokens> {
