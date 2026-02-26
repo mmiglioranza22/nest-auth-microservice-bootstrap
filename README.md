@@ -2,12 +2,13 @@
 
 🚧 **WORK IN PROGRESS** 🚧
 
+Check the project related to this repository to see the roadmap
 Pending work:
 
 - [ ] Testing (refactor)
 - [ ] Shared modules (refactor as **packages**)
 - [ ] Outbox pattern (sync between auth_user and user entities)
-- [ ] Update READMEs (nats jetstream instructions, main instractions for pem keys)
+- [ ] Update READMEs (nats jetstream instructions, )
 - [ ] Remove comments (TODOs)
 - [ ] Fix Dockerfiles
 - [ ] Update env-variables.ts for each app
